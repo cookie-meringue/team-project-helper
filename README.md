@@ -1,73 +1,112 @@
-# Welcome to your Lovable project
+# 팀플을 위한 서비스
 
-## Project info
+팀 프로젝트나 간단한 팀플을 하다 보면 카톡방을 만들어서 연락을 주고 받는다.
 
-**URL**: https://lovable.dev/projects/9cb91bae-0c99-464f-99dc-e0a54d9de166
+그러다 보면, 공지나 중요한 안건은 계속 위로 올라가게 된다.
 
-## How can I edit this code?
+카톡은 채팅 서비스이기 때문에 해야 하는 작업이나 공지를 못 보고 지나치게 되는 경우가 많다.
 
-There are several ways of editing your application.
+여기서 발생하는 불편함을 해소하기 위해 간단한 팀플 서비스를 구상했다.
 
-**Use Lovable**
+조장은 팀 정보(팀명, 인원, 소속 등)를 입력해 팀을 하나 생성한다.
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/9cb91bae-0c99-464f-99dc-e0a54d9de166) and start prompting.
+팀을 생성하면 팀 페이지가 생기고, 공지사항, 글, 현재 해야 하는 일 등등이 생긴다.
 
-Changes made via Lovable will be committed automatically to this repo.
+조장은 이 페이지 링크를 공유한다.
 
-**Use your preferred IDE**
+팀원은 이 페이지로 들어와 함께 작업을 시작한다.
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
 
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
+## **사용자, 니즈**
 
-Follow these steps:
+| 사용자 | 사용자 니즈 |
+| --- | --- |
+| **팀 프로젝트 조장** | 공지사항 전달, 역할 분담 |
+| **팀 프로젝트 조원** | 공지사항 확인, 역할 확인, 이슈 공유 |
 
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
 
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
+## 페르소나
 
-# Step 3: Install the necessary dependencies.
-npm i
+| 사용자 | 페르소나 |
+| --- | --- |
+| **팀 프로젝트 조장** | **이름**: 김머랭<br>**나이**: 24세<br>**전공**: 경영학<br>**역할**: 명지대학교 경영학 수업의 팀 프로젝트 조장<br>**목표**: 팀을 보다 효율적으로 이끌고 싶다.<br>**니즈**: 공지사항 관리, 역할 분담 관리. |
+| **팀 프로젝트 조원** | **이름**: 송모코<br>**나이**: 20세<br>**전공**: 경영학<br>**역할**: 명지대학교 경영학 수업의 팀 프로젝트 조원<br>**목표**: 팀 프로젝트에 적극적으로 참여하고 싶다.<br>**니즈**: 공지사항 확인, 역할 분담 결과 확인, 이슈 공유. |
 
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
-```
 
-**Edit a file directly in GitHub**
+## 시나리오
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### 팀 프로젝트 조장 시나리오
 
-**Use GitHub Codespaces**
+- 목표: 팀을 보다 효율적으로 이끌기
+- 시나리오:
+    - 조장이 된 김머랭은 서비스를 실행합니다.
+    - 조 정보(이름, 인원 수 등)을 입력하여 팀을 생성합니다.
+    - 생성된 팀 QR을 조원들에게 공유합니다.
+    - 김머랭은 조원들과 회의해 역할을 분담한 후, 서비스에 접속해 역할 분담 결과를 입력합니다.
+    - 김머랭은 교수님으로부터 전달받은 사항을 공지사항으로 작성합니다.
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+### 팀 프로젝트 조원 시나리오
 
-## What technologies are used for this project?
+- 목표: 팀 프로젝트에 적극적으로 참여하기
+- 시나리오:
+    - 조원이 된 송모코는 김머랭으로부터 팀 QR 을 전달받아 스캔합니다.
+    - 서비스에 접속한 송모코는 이름을 입력해 팀에 합류합니다.
+    - 송모코는 조원들과 회의해 역할을 분담받은 후, 서비스에 접속해 자신의 역할을 확인합니다.
+    - 송모코는 간간히 서비스에 접속해 공지사항을 확인합니다.
+    - 송모코는 자료조사 중 도움이 필요해 이슈를 등록합니다.
 
-This project is built with:
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+## 요구사항 도출
 
-## How can I deploy this project?
+| 페르소나 | 시나리오 | 요구사항 |
+| --- | --- | --- |
+| **팀 프로젝트 조장** |  조장이 된 김머랭은 스마트폰에서 서비스를 실행합니다.<br> 서비스의 메인 화면에서 팀 만들기를 선택한 김머랭은 조 정보(이름, 인원 수 등)을 입력하여 팀을 생성합니다.<br> 김머랭은 팀을 생성해 만들어진 QR 코드를 조원들에게 공유합니다.<br> 김머랭은 회의를 통해 분담한 역할을 서비스에 등록합니다.<br> 김머랭은 교수님에게 전달받은 사항을 공지사항으로 작성합니다. | 1. 팀 생성 기능<br>2. 조원 별 역할 관리(CRUD) 기능<br>3. 공지사항 관리(CRUD) 기능
+| **팀 프로젝트 조원** |  조원이 된 송모코는 김머랭이 공유한 QR 을 스캔해 서비스에 접속합니다.<br> 서비스에 접속한 송모코는 이름을 입력해 팀에 합류합니다.<br> 송모코는 회의를 통해 정해진 역할을 서비스를 통해 확인합니다.<br> 송모코는 김머랭이 등록한 공지사항을 지속적으로 조회하고 인지합니다.<br> 송모코는 자료조사 중 도움이 필요해 이슈를 등록합니다. | 1. 팀 참여 기능<br>2. 조원 별 역할 조회 기능<br>3. 공지사항 조회 기능<br>4. 이슈 관리(CRUD) 기능 |
 
-Simply open [Lovable](https://lovable.dev/projects/9cb91bae-0c99-464f-99dc-e0a54d9de166) and click on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
+## 사용자 스토리와 인수 조건
 
-Yes, you can!
+### 팀 프로젝트 조장 - 조원 별 역할 관리 기능
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+- 요구사항: 조원 별 역할 관리 기능
+- 사용자 스토리: “조장으로써, 조원의 역할을 명확하게 분리하고 공유하기 위해 조원 별 역할 관리, 공유 기능을 이용하고 싶습니다.
+- 인수 조건:
+    - Given: 역할 분담을 마친 조장이 서비스에 접속합니다.
+    - When: 조장이 조원 별 역할 관리를 선택합니다.
+    - Then: 서비스는 조원 별 역할 상태를 표시하고 CRUD 기능을 제공합니다.
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+### 팀 프로젝트 조장 - 공지사항 관리 기능
+
+- 요구사항: 공지사항 관리 기능
+- 사용자 스토리: “조장으로써, 전달 사항을 명확하고 가독성 좋게 공유하기 위해 공지사항 관리 기능을 이용하고 싶습니다.
+- 인수 조건:
+    - Given: 교수님에게 공지사항을 전달받은 조장이 서비스에 접속합니다.
+    - When: 조장이 공지사항 작성 기능을 선택합니다.
+    - Then: 서비스는 공지사항을 작성(C)하고 관리(RUD)할 수 있는 기능을 제공합니다.
+
+### 팀 프로젝트 조원 - 조원 별 역할 조회 기능
+
+- 요구사항: 조원 별 역할 조회 기능
+- 사용자 스토리: “조원으로써, 조원들의 역할을 명확하게 인지하기 위해 조원 별 역할 조회 기능을 이용하고 싶습니다.”
+- 인수 조건:
+    - Given: 자신의 역할을 확인하고자 하는 조원이 서비스에 접속합니다.
+    - When: 조원이 조원 별 역할 조회를 선택합니다.
+    - Then: 서비스는 조원 별 역할 상태를 표시합니다.
+
+### 팀 프로젝트 조원 - 공지사항 조회 기능
+
+- 요구사항: 공지사항 조회 기능
+- 사용자 스토리: “조원으로써, 공지사항을 지속적으로 확인하고 인지하기 위해 공지사항 조회 기능을 이용하고 싶습니다.”
+- 인수 조건:
+    - Given: 공지사항을 다시 확인하고자 하는 조원이 서비스에 접속합니다.
+    - When: 조원이 공지사항 조회를 선택합니다.
+    - Then: 서비스는 공지사항 목록과 상세 보기 기능을 제공합니다.
+
+### 팀 프로젝트 조원 - 이슈 공유 기능
+
+- 요구사항: 이슈 공유 기능
+- 사용자 스토리: “조원으로써, 업무 수행 중 발생하는 이슈를 효과적으로 공유하기 위해 이슈 공유 기능을 이용하고 싶습니다.”
+- 인수 조건:
+    - Given: 이슈가 생긴 조원이 서비스에 접속합니다.
+    - When: 조원이 이슈 공유를 선택합니다.
+    - Then: 서비스는 이슈를 공유(C) 하고 관리(RUD)할 수 있는 기능을 제공합니다.
