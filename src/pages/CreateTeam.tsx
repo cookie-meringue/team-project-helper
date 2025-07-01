@@ -7,12 +7,13 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { Team, User } from '@/types';
+import { generateShortId } from '@/utils/idGenerator';
 
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState('');
   const [maxMembers, setMaxMembers] = useState('');
   const [leaderName, setLeaderName] = useState('');
-  const { teams, setTeams, setCurrentUser } = useApp();
+  const { teams, setTeams, users, setUsers, setCurrentUser } = useApp();
   const navigate = useNavigate();
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -24,7 +25,7 @@ export default function CreateTeam() {
     }
 
     const teamId = Date.now().toString();
-    const userId = `leader_${teamId}`;
+    const userId = generateShortId();
     
     const newTeam: Team = {
       id: teamId,
@@ -43,7 +44,10 @@ export default function CreateTeam() {
     };
 
     setTeams([...teams, newTeam]);
+    setUsers([...users, newUser]);
     setCurrentUser(newUser);
+    
+    alert(`팀이 생성되었습니다! 당신의 사용자 ID: ${userId}`);
     navigate('/leader-dashboard');
   };
 

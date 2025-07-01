@@ -7,6 +7,7 @@ import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AppProvider } from "./contexts/AppContext";
 import Index from "./pages/Index";
 import Home from "./pages/Home";
+import Login from "./pages/Login";
 import CreateTeam from "./pages/CreateTeam";
 import JoinTeam from "./pages/JoinTeam";
 import LeaderDashboard from "./pages/LeaderDashboard";
@@ -24,6 +25,7 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Home />} />
+            <Route path="/login" element={<Login />} />
             <Route path="/create-team" element={<CreateTeam />} />
             <Route path="/join-team" element={<JoinTeam />} />
             <Route path="/leader-dashboard" element={<LeaderDashboard />} />

@@ -8,12 +8,13 @@ import { QRScanner } from '@/components/QRScanner';
 import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
 import { User, TeamMember } from '@/types';
+import { generateShortId } from '@/utils/idGenerator';
 
 export default function JoinTeam() {
   const [memberName, setMemberName] = useState('');
   const [scannedTeamId, setScannedTeamId] = useState('');
   const [showScanner, setShowScanner] = useState(false);
-  const { teams, teamMembers, setTeamMembers, setCurrentUser } = useApp();
+  const { teams, teamMembers, setTeamMembers, users, setUsers, setCurrentUser } = useApp();
   const navigate = useNavigate();
 
   const handleQRScan = (result: string) => {
@@ -41,9 +42,9 @@ export default function JoinTeam() {
       return;
     }
 
-    const memberId = `member_${Date.now()}`;
+    const userId = generateShortId();
     const newMember: TeamMember = {
-      id: memberId,
+      id: userId,
       name: memberName,
       teamId: scannedTeamId,
       role: '팀원', // 기본 역할
@@ -51,14 +52,17 @@ export default function JoinTeam() {
     };
 
     const newUser: User = {
-      id: memberId,
+      id: userId,
       name: memberName,
       type: 'member',
       teamId: scannedTeamId,
     };
 
     setTeamMembers([...teamMembers, newMember]);
+    setUsers([...users, newUser]);
     setCurrentUser(newUser);
+    
+    alert(`팀에 참여했습니다! 당신의 사용자 ID: ${userId}`);
     navigate('/member-dashboard');
   };
 

@@ -6,6 +6,8 @@ import { User, Team, TeamMember, Announcement, Issue } from '@/types';
 interface AppContextType {
   currentUser: User | null;
   setCurrentUser: (user: User | null) => void;
+  users: User[];
+  setUsers: (users: User[]) => void;
   teams: Team[];
   setTeams: (teams: Team[]) => void;
   teamMembers: TeamMember[];
@@ -20,6 +22,7 @@ const AppContext = createContext<AppContextType | undefined>(undefined);
 
 export function AppProvider({ children }: { children: ReactNode }) {
   const [currentUser, setCurrentUser] = useLocalStorage<User | null>('currentUser', null);
+  const [users, setUsers] = useLocalStorage<User[]>('users', []);
   const [teams, setTeams] = useLocalStorage<Team[]>('teams', []);
   const [teamMembers, setTeamMembers] = useLocalStorage<TeamMember[]>('teamMembers', []);
   const [announcements, setAnnouncements] = useLocalStorage<Announcement[]>('announcements', []);
@@ -30,6 +33,8 @@ export function AppProvider({ children }: { children: ReactNode }) {
       value={{
         currentUser,
         setCurrentUser,
+        users,
+        setUsers,
         teams,
         setTeams,
         teamMembers,
