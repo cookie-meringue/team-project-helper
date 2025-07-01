@@ -9,10 +9,15 @@ import { AnnouncementsList } from '@/components/AnnouncementsList';
 import { IssuesManagement } from '@/components/IssuesManagement';
 
 export default function MemberDashboard() {
-  const { currentUser, teams } = useApp();
+  const { currentUser, teams, setCurrentUser } = useApp();
   const navigate = useNavigate();
   
   const currentTeam = teams.find(t => t.id === currentUser?.teamId);
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    navigate('/');
+  };
 
   if (!currentUser || !currentTeam) {
     navigate('/');
@@ -24,19 +29,19 @@ export default function MemberDashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Team Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900">팀 대시보드</h1>
             <p className="text-gray-600">{currentTeam.name}</p>
           </div>
-          <Button variant="outline" onClick={() => navigate('/')}>
-            Logout
+          <Button variant="outline" onClick={handleLogout}>
+            로그아웃
           </Button>
         </div>
 
         <Tabs defaultValue="role" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="role">My Role</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="issues">Issues</TabsTrigger>
+            <TabsTrigger value="role">내 역할</TabsTrigger>
+            <TabsTrigger value="announcements">공지사항</TabsTrigger>
+            <TabsTrigger value="issues">이슈</TabsTrigger>
           </TabsList>
 
           <TabsContent value="role">

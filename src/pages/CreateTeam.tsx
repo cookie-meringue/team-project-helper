@@ -19,7 +19,7 @@ export default function CreateTeam() {
     e.preventDefault();
     
     if (!teamName || !maxMembers || !leaderName) {
-      alert('Please fill in all fields');
+      alert('모든 필드를 입력해주세요');
       return;
     }
 
@@ -52,43 +52,43 @@ export default function CreateTeam() {
       <div className="max-w-md mx-auto pt-8">
         <Card>
           <CardHeader>
-            <CardTitle>Create New Team</CardTitle>
+            <CardTitle>새 팀 생성</CardTitle>
             <CardDescription>
-              Set up your team for collaboration
+              협업을 위한 팀을 설정하세요
             </CardDescription>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div>
-                <Label htmlFor="leaderName">Your Name</Label>
+                <Label htmlFor="leaderName">팀장 이름</Label>
                 <Input
                   id="leaderName"
                   value={leaderName}
                   onChange={(e) => setLeaderName(e.target.value)}
-                  placeholder="Enter your name"
+                  placeholder="이름을 입력하세요"
                   required
                 />
               </div>
               
               <div>
-                <Label htmlFor="teamName">Team Name</Label>
+                <Label htmlFor="teamName">팀 이름</Label>
                 <Input
                   id="teamName"
                   value={teamName}
                   onChange={(e) => setTeamName(e.target.value)}
-                  placeholder="Enter team name"
+                  placeholder="팀 이름을 입력하세요"
                   required
                 />
               </div>
               
               <div>
-                <Label htmlFor="maxMembers">Maximum Members</Label>
+                <Label htmlFor="maxMembers">최대 멤버 수</Label>
                 <Input
                   id="maxMembers"
                   type="number"
                   value={maxMembers}
                   onChange={(e) => setMaxMembers(e.target.value)}
-                  placeholder="Enter max number of members"
+                  placeholder="최대 멤버 수를 입력하세요"
                   min="2"
                   max="20"
                   required
@@ -97,10 +97,10 @@ export default function CreateTeam() {
               
               <div className="flex space-x-2">
                 <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
-                  Cancel
+                  취소
                 </Button>
                 <Button type="submit" className="flex-1">
-                  Create Team
+                  팀 생성
                 </Button>
               </div>
             </form>

@@ -17,7 +17,7 @@ export default function JoinTeam() {
   const navigate = useNavigate();
 
   const handleQRScan = (result: string) => {
-    // Extract team ID from QR code data
+    // QR 코드 데이터에서 팀 ID 추출
     const teamId = result.replace('team:', '');
     setScannedTeamId(teamId);
     setShowScanner(false);
@@ -25,19 +25,19 @@ export default function JoinTeam() {
 
   const handleJoinTeam = () => {
     if (!memberName || !scannedTeamId) {
-      alert('Please enter your name and scan a QR code');
+      alert('이름을 입력하고 QR 코드를 스캔해주세요');
       return;
     }
 
     const team = teams.find(t => t.id === scannedTeamId);
     if (!team) {
-      alert('Team not found');
+      alert('팀을 찾을 수 없습니다');
       return;
     }
 
     const currentMembers = teamMembers.filter(m => m.teamId === scannedTeamId);
     if (currentMembers.length >= team.maxMembers) {
-      alert('Team is full');
+      alert('팀이 가득 찼습니다');
       return;
     }
 
@@ -46,7 +46,7 @@ export default function JoinTeam() {
       id: memberId,
       name: memberName,
       teamId: scannedTeamId,
-      role: 'Member', // Default role
+      role: '팀원', // 기본 역할
       joinedAt: new Date().toISOString(),
     };
 
@@ -67,19 +67,19 @@ export default function JoinTeam() {
       <div className="max-w-md mx-auto pt-8">
         <Card>
           <CardHeader>
-            <CardTitle>Join Team</CardTitle>
+            <CardTitle>팀 참여</CardTitle>
             <CardDescription>
-              Scan QR code to join an existing team
+              QR 코드를 스캔하여 기존 팀에 참여하세요
             </CardDescription>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <Label htmlFor="memberName">Your Name</Label>
+              <Label htmlFor="memberName">이름</Label>
               <Input
                 id="memberName"
                 value={memberName}
                 onChange={(e) => setMemberName(e.target.value)}
-                placeholder="Enter your name"
+                placeholder="이름을 입력하세요"
                 required
               />
             </div>
@@ -87,11 +87,11 @@ export default function JoinTeam() {
             {!showScanner ? (
               <div className="text-center">
                 <Button onClick={() => setShowScanner(true)} className="w-full">
-                  Scan QR Code
+                  QR 코드 스캔
                 </Button>
                 {scannedTeamId && (
                   <p className="text-sm text-green-600 mt-2">
-                    ✓ QR Code scanned successfully
+                    ✓ QR 코드 스캔 완료
                   </p>
                 )}
               </div>
@@ -106,14 +106,14 @@ export default function JoinTeam() {
 
             <div className="flex space-x-2">
               <Button type="button" variant="outline" onClick={() => navigate('/')} className="flex-1">
-                Cancel
+                취소
               </Button>
               <Button 
                 onClick={handleJoinTeam} 
                 className="flex-1"
                 disabled={!memberName || !scannedTeamId}
               >
-                Join Team
+                팀 참여
               </Button>
             </div>
           </CardContent>

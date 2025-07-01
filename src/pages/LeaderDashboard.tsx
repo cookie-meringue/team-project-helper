@@ -10,10 +10,15 @@ import { MembersManagement } from '@/components/MembersManagement';
 import { AnnouncementsManagement } from '@/components/AnnouncementsManagement';
 
 export default function LeaderDashboard() {
-  const { currentUser, teams } = useApp();
+  const { currentUser, teams, setCurrentUser } = useApp();
   const navigate = useNavigate();
   
   const currentTeam = teams.find(t => t.id === currentUser?.teamId);
+
+  const handleLogout = () => {
+    setCurrentUser(null);
+    navigate('/');
+  };
 
   if (!currentUser || !currentTeam) {
     navigate('/');
@@ -27,19 +32,19 @@ export default function LeaderDashboard() {
       <div className="max-w-4xl mx-auto">
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h1 className="text-2xl font-bold text-gray-900">Team Dashboard</h1>
+            <h1 className="text-2xl font-bold text-gray-900">팀 대시보드</h1>
             <p className="text-gray-600">{currentTeam.name}</p>
           </div>
-          <Button variant="outline" onClick={() => navigate('/')}>
-            Logout
+          <Button variant="outline" onClick={handleLogout}>
+            로그아웃
           </Button>
         </div>
 
         <Tabs defaultValue="members" className="space-y-4">
           <TabsList className="grid w-full grid-cols-3">
-            <TabsTrigger value="members">Members & Roles</TabsTrigger>
-            <TabsTrigger value="announcements">Announcements</TabsTrigger>
-            <TabsTrigger value="qr">QR Code</TabsTrigger>
+            <TabsTrigger value="members">멤버 & 역할</TabsTrigger>
+            <TabsTrigger value="announcements">공지사항</TabsTrigger>
+            <TabsTrigger value="qr">QR 코드</TabsTrigger>
           </TabsList>
 
           <TabsContent value="members">
@@ -53,9 +58,9 @@ export default function LeaderDashboard() {
           <TabsContent value="qr">
             <Card>
               <CardHeader>
-                <CardTitle>Team QR Code</CardTitle>
+                <CardTitle>팀 QR 코드</CardTitle>
                 <CardDescription>
-                  Share this QR code with team members to let them join
+                  이 QR 코드를 팀원들과 공유하여 팀 참여를 도와주세요
                 </CardDescription>
               </CardHeader>
               <CardContent className="flex justify-center">
