@@ -11,7 +11,7 @@ export default function CreateTeam() {
   const [teamName, setTeamName] = useState('');
   const [maxMembers, setMaxMembers] = useState('');
   const [leaderName, setLeaderName] = useState('');
-  const { createTeam, createUser, setCurrentUser } = useApp();
+  const { createTeam, createUser, setCurrentUser, users, refetch } = useApp();
   const navigate = useNavigate();
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -23,7 +23,7 @@ export default function CreateTeam() {
     }
 
     try {
-      // 먼저 사용자 생성
+      // 먼저 사용자 생성 (team_id 없이)
       const newUser = await createUser({
         name: leaderName,
         type: 'leader',
@@ -38,15 +38,36 @@ export default function CreateTeam() {
         leaderName: leaderName,
       });
 
-      // 사용자의 팀 ID 업데이트
+      // 사용자의 team_id 업데이트
+      await updateUserTeamId(newUser.id, newTeam.id);
+      
+      // 업데이트된 사용자 정보로 currentUser 설정
       const updatedUser = { ...newUser, teamId: newTeam.id };
       setCurrentUser(updatedUser);
+      
+      // 데이터 새로고침
+      await refetch();
       
       alert(`팀이 생성되었습니다! 당신의 사용자 ID: ${newUser.id}`);
       navigate('/leader-dashboard');
     } catch (error) {
       console.error('팀 생성 실패:', error);
       alert('팀 생성에 실패했습니다');
+    }
+  };
+
+  // 사용자의 team_id를 업데이트하는 함수
+  const updateUserTeamId = async (userId: string, teamId: string) => {
+    const { supabase } = await import('@/integrations/supabase/client');
+    
+    const { error } = await supabase
+      .from('users')
+      .update({ team_id: teamId })
+      .eq('id', userId);
+
+    if (error) {
+      console.error('사용자 team_id 업데이트 실패:', error);
+      throw error;
     }
   };
 

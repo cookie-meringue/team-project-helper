@@ -14,14 +14,19 @@ export default function Home() {
     setCurrentUser(null);
   };
 
-  // 이미 로그인된 사용자라면 해당 대시보드로 리다이렉트
+  // Only redirect if user is explicitly navigating to home, not on refresh
   React.useEffect(() => {
-    if (currentUser && !loading) {
-      if (currentUser.type === 'leader') {
-        navigate('/leader-dashboard');
-      } else {
-        navigate('/member-dashboard');
-      }
+    if (currentUser && !loading && window.location.pathname === '/') {
+      // Only redirect if we're specifically on the home route
+      const timer = setTimeout(() => {
+        if (currentUser.type === 'leader') {
+          navigate('/leader-dashboard');
+        } else {
+          navigate('/member-dashboard');
+        }
+      }, 100); // Small delay to prevent issues with initial load
+
+      return () => clearTimeout(timer);
     }
   }, [currentUser, loading, navigate]);
 

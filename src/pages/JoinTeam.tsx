@@ -12,7 +12,7 @@ export default function JoinTeam() {
   const [memberName, setMemberName] = useState('');
   const [scannedTeamId, setScannedTeamId] = useState('');
   const [showScanner, setShowScanner] = useState(false);
-  const { teams, teamMembers, createTeamMember, createUser, setCurrentUser } = useApp();
+  const { teams, teamMembers, createTeamMember, createUser, setCurrentUser, refetch } = useApp();
   const navigate = useNavigate();
 
   const handleQRScan = (result: string) => {
@@ -41,7 +41,7 @@ export default function JoinTeam() {
     }
 
     try {
-      // 먼저 사용자 생성
+      // 먼저 사용자 생성 (올바른 team_id와 함께)
       const newUser = await createUser({
         name: memberName,
         type: 'member',
@@ -56,6 +56,9 @@ export default function JoinTeam() {
       });
 
       setCurrentUser(newUser);
+      
+      // 데이터 새로고침
+      await refetch();
       
       alert(`팀에 참여했습니다! 당신의 사용자 ID: ${newUser.id}`);
       navigate('/member-dashboard');
