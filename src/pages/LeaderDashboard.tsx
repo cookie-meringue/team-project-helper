@@ -33,9 +33,17 @@ export default function LeaderDashboard() {
     );
   }
 
+  // 사용자나 팀이 없을 때 홈으로 리다이렉트하지 않고 에러 메시지 표시
   if (!currentUser || !currentTeam) {
-    navigate('/');
-    return null;
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <h2 className="text-xl font-semibold text-gray-900 mb-2">접근할 수 없습니다</h2>
+          <p className="text-gray-600 mb-4">로그인하거나 팀을 생성해주세요.</p>
+          <Button onClick={() => navigate('/')}>홈으로 이동</Button>
+        </div>
+      </div>
+    );
   }
 
   const qrValue = `team:${currentTeam.id}`;
