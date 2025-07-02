@@ -16,7 +16,7 @@ export function AnnouncementsList() {
       <CardHeader>
         <CardTitle className="flex items-center gap-2">
           <MessageSquare className="w-5 h-5" />
-          Team Announcements ({currentTeamAnnouncements.length})
+          팀 공지사항 ({currentTeamAnnouncements.length})
         </CardTitle>
       </CardHeader>
       <CardContent>
@@ -26,9 +26,9 @@ export function AnnouncementsList() {
               <h3 className="font-semibold text-lg mb-2">{announcement.title}</h3>
               <p className="text-gray-700 mb-2">{announcement.content}</p>
               <div className="text-sm text-gray-500">
-                By {announcement.createdBy} • {new Date(announcement.createdAt).toLocaleDateString()}
+                작성자: {announcement.createdBy} • {new Date(announcement.createdAt).toLocaleDateString()}
                 {announcement.updatedAt !== announcement.createdAt && (
-                  <span> • Updated {new Date(announcement.updatedAt).toLocaleDateString()}</span>
+                  <span> • 수정됨: {new Date(announcement.updatedAt).toLocaleDateString()}</span>
                 )}
               </div>
             </div>
@@ -36,7 +36,7 @@ export function AnnouncementsList() {
           
           {currentTeamAnnouncements.length === 0 && (
             <p className="text-center text-gray-500 py-8">
-              No announcements yet. Check back later!
+              아직 공지사항이 없습니다. 나중에 다시 확인해보세요!
             </p>
           )}
         </div>

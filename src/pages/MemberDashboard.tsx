@@ -7,9 +7,10 @@ import { useNavigate } from 'react-router-dom';
 import { MyRole } from '@/components/MyRole';
 import { AnnouncementsList } from '@/components/AnnouncementsList';
 import { IssuesManagement } from '@/components/IssuesManagement';
+import { DocumentManagement } from '@/components/DocumentManagement';
 
 export default function MemberDashboard() {
-  const { currentUser, teams, setCurrentUser } = useApp();
+  const { currentUser, teams, setCurrentUser, loading } = useApp();
   const navigate = useNavigate();
   
   const currentTeam = teams.find(t => t.id === currentUser?.teamId);
@@ -18,6 +19,17 @@ export default function MemberDashboard() {
     setCurrentUser(null);
     navigate('/');
   };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   if (!currentUser || !currentTeam) {
     navigate('/');
@@ -38,10 +50,11 @@ export default function MemberDashboard() {
         </div>
 
         <Tabs defaultValue="role" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-3">
+          <TabsList className="grid w-full grid-cols-4">
             <TabsTrigger value="role">내 역할</TabsTrigger>
             <TabsTrigger value="announcements">공지사항</TabsTrigger>
             <TabsTrigger value="issues">이슈</TabsTrigger>
+            <TabsTrigger value="documents">문서</TabsTrigger>
           </TabsList>
 
           <TabsContent value="role">
@@ -54,6 +67,10 @@ export default function MemberDashboard() {
 
           <TabsContent value="issues">
             <IssuesManagement />
+          </TabsContent>
+
+          <TabsContent value="documents">
+            <DocumentManagement />
           </TabsContent>
         </Tabs>
       </div>

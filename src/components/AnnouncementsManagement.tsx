@@ -9,9 +9,11 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from 
 import { useApp } from '@/contexts/AppContext';
 import { Announcement } from '@/types';
 import { MessageSquare, Plus } from 'lucide-react';
+import { useToast } from '@/components/ui/use-toast';
 
 export function AnnouncementsManagement() {
-  const { currentUser, announcements, setAnnouncements } = useApp();
+  const { currentUser, announcements, createAnnouncement, updateAnnouncement, deleteAnnouncement } = useApp();
+  const { toast } = useToast();
   const [newTitle, setNewTitle] = useState('');
   const [newContent, setNewContent] = useState('');
   const [editingAnnouncement, setEditingAnnouncement] = useState<Announcement | null>(null);
@@ -21,51 +23,93 @@ export function AnnouncementsManagement() {
     .filter(a => a.teamId === currentUser?.teamId)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const handleCreateAnnouncement = () => {
+  const handleCreateAnnouncement = async () => {
     if (!newTitle.trim() || !newContent.trim()) {
-      alert('Please fill in all fields');
+      toast({
+        title: "오류",
+        description: "제목과 내용을 모두 입력해주세요.",
+        variant: "destructive",
+      });
       return;
     }
 
-    const newAnnouncement: Announcement = {
-      id: Date.now().toString(),
-      teamId: currentUser?.teamId || '',
-      title: newTitle,
-      content: newContent,
-      createdBy: currentUser?.name || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-    };
+    try {
+      await createAnnouncement({
+        teamId: currentUser?.teamId || '',
+        title: newTitle,
+        content: newContent,
+        createdBy: currentUser?.name || '',
+      });
 
-    setAnnouncements([...announcements, newAnnouncement]);
-    setNewTitle('');
-    setNewContent('');
-    setIsDialogOpen(false);
+      toast({
+        title: "성공",
+        description: "공지사항이 성공적으로 작성되었습니다.",
+      });
+
+      setNewTitle('');
+      setNewContent('');
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('공지사항 작성 실패:', error);
+      toast({
+        title: "오류",
+        description: "공지사항 작성에 실패했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleUpdateAnnouncement = () => {
+  const handleUpdateAnnouncement = async () => {
     if (!editingAnnouncement || !newTitle.trim() || !newContent.trim()) {
-      alert('Please fill in all fields');
+      toast({
+        title: "오류",
+        description: "제목과 내용을 모두 입력해주세요.",
+        variant: "destructive",
+      });
       return;
     }
 
-    setAnnouncements(
-      announcements.map(a =>
-        a.id === editingAnnouncement.id
-          ? { ...a, title: newTitle, content: newContent, updatedAt: new Date().toISOString() }
-          : a
-      )
-    );
-    
-    setEditingAnnouncement(null);
-    setNewTitle('');
-    setNewContent('');
-    setIsDialogOpen(false);
+    try {
+      await updateAnnouncement(editingAnnouncement.id, {
+        title: newTitle,
+        content: newContent,
+      });
+
+      toast({
+        title: "성공",
+        description: "공지사항이 성공적으로 수정되었습니다.",
+      });
+      
+      setEditingAnnouncement(null);
+      setNewTitle('');
+      setNewContent('');
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('공지사항 수정 실패:', error);
+      toast({
+        title: "오류",
+        description: "공지사항 수정에 실패했습니다.",
+        variant: "destructive",
+      });
+    }
   };
 
-  const handleDeleteAnnouncement = (id: string) => {
-    if (confirm('Are you sure you want to delete this announcement?')) {
-      setAnnouncements(announcements.filter(a => a.id !== id));
+  const handleDeleteAnnouncement = async (id: string) => {
+    if (confirm('이 공지사항을 삭제하시겠습니까?')) {
+      try {
+        await deleteAnnouncement(id);
+        toast({
+          title: "성공",
+          description: "공지사항이 삭제되었습니다.",
+        });
+      } catch (error) {
+        console.error('공지사항 삭제 실패:', error);
+        toast({
+          title: "오류",
+          description: "공지사항 삭제에 실패했습니다.",
+          variant: "destructive",
+        });
+      }
     }
   };
 
@@ -90,38 +134,38 @@ export function AnnouncementsManagement() {
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              Announcements ({currentTeamAnnouncements.length})
+              공지사항 ({currentTeamAnnouncements.length})
             </CardTitle>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={() => setIsDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
-                  New Announcement
+                  새 공지사항
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
-                    {editingAnnouncement ? 'Edit Announcement' : 'Create New Announcement'}
+                    {editingAnnouncement ? '공지사항 수정' : '새 공지사항 작성'}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">제목</Label>
                     <Input
                       id="title"
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="Enter announcement title"
+                      placeholder="공지사항 제목을 입력하세요"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="content">Content</Label>
+                    <Label htmlFor="content">내용</Label>
                     <Textarea
                       id="content"
                       value={newContent}
                       onChange={(e) => setNewContent(e.target.value)}
-                      placeholder="Enter announcement content"
+                      placeholder="공지사항 내용을 입력하세요"
                       rows={4}
                     />
                   </div>
@@ -130,10 +174,10 @@ export function AnnouncementsManagement() {
                       onClick={editingAnnouncement ? handleUpdateAnnouncement : handleCreateAnnouncement}
                       className="flex-1"
                     >
-                      {editingAnnouncement ? 'Update' : 'Create'}
+                      {editingAnnouncement ? '수정' : '작성'}
                     </Button>
                     <Button variant="outline" onClick={resetDialog} className="flex-1">
-                      Cancel
+                      취소
                     </Button>
                   </div>
                 </div>
@@ -153,22 +197,22 @@ export function AnnouncementsManagement() {
                       size="sm"
                       onClick={() => openEditDialog(announcement)}
                     >
-                      Edit
+                      수정
                     </Button>
                     <Button 
                       variant="destructive" 
                       size="sm"
                       onClick={() => handleDeleteAnnouncement(announcement.id)}
                     >
-                      Delete
+                      삭제
                     </Button>
                   </div>
                 </div>
                 <p className="text-gray-700 mb-2">{announcement.content}</p>
                 <div className="text-sm text-gray-500">
-                  By {announcement.createdBy} • {new Date(announcement.createdAt).toLocaleDateString()}
+                  작성자: {announcement.createdBy} • {new Date(announcement.createdAt).toLocaleDateString()}
                   {announcement.updatedAt !== announcement.createdAt && (
-                    <span> • Updated {new Date(announcement.updatedAt).toLocaleDateString()}</span>
+                    <span> • 수정됨: {new Date(announcement.updatedAt).toLocaleDateString()}</span>
                   )}
                 </div>
               </div>
@@ -176,7 +220,7 @@ export function AnnouncementsManagement() {
             
             {currentTeamAnnouncements.length === 0 && (
               <p className="text-center text-gray-500 py-8">
-                No announcements yet. Create your first announcement!
+                아직 공지사항이 없습니다. 첫 번째 공지사항을 작성해보세요!
               </p>
             )}
           </div>

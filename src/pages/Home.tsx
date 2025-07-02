@@ -8,7 +8,7 @@ import { useApp } from '@/contexts/AppContext';
 
 export default function Home() {
   const navigate = useNavigate();
-  const { currentUser, setCurrentUser } = useApp();
+  const { currentUser, setCurrentUser, loading } = useApp();
 
   const handleLogout = () => {
     setCurrentUser(null);
@@ -16,14 +16,25 @@ export default function Home() {
 
   // 이미 로그인된 사용자라면 해당 대시보드로 리다이렉트
   React.useEffect(() => {
-    if (currentUser) {
+    if (currentUser && !loading) {
       if (currentUser.type === 'leader') {
         navigate('/leader-dashboard');
       } else {
         navigate('/member-dashboard');
       }
     }
-  }, [currentUser, navigate]);
+  }, [currentUser, loading, navigate]);
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-4 text-gray-600">로딩 중...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-100 p-4">
