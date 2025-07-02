@@ -7,14 +7,12 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { QRScanner } from '@/components/QRScanner';
 import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { User, TeamMember } from '@/types';
-import { generateShortId } from '@/utils/idGenerator';
 
 export default function JoinTeam() {
   const [memberName, setMemberName] = useState('');
   const [scannedTeamId, setScannedTeamId] = useState('');
   const [showScanner, setShowScanner] = useState(false);
-  const { teams, teamMembers, setTeamMembers, users, setUsers, setCurrentUser } = useApp();
+  const { teams, teamMembers, createTeamMember, createUser, setCurrentUser } = useApp();
   const navigate = useNavigate();
 
   const handleQRScan = (result: string) => {
@@ -24,7 +22,7 @@ export default function JoinTeam() {
     setShowScanner(false);
   };
 
-  const handleJoinTeam = () => {
+  const handleJoinTeam = async () => {
     if (!memberName || !scannedTeamId) {
       alert('이름을 입력하고 QR 코드를 스캔해주세요');
       return;
@@ -42,28 +40,29 @@ export default function JoinTeam() {
       return;
     }
 
-    const userId = generateShortId();
-    const newMember: TeamMember = {
-      id: userId,
-      name: memberName,
-      teamId: scannedTeamId,
-      role: '팀원', // 기본 역할
-      joinedAt: new Date().toISOString(),
-    };
+    try {
+      // 먼저 사용자 생성
+      const newUser = await createUser({
+        name: memberName,
+        type: 'member',
+        teamId: scannedTeamId,
+      });
 
-    const newUser: User = {
-      id: userId,
-      name: memberName,
-      type: 'member',
-      teamId: scannedTeamId,
-    };
+      // 팀 멤버 생성
+      await createTeamMember({
+        name: memberName,
+        teamId: scannedTeamId,
+        role: '팀원', // 기본 역할
+      });
 
-    setTeamMembers([...teamMembers, newMember]);
-    setUsers([...users, newUser]);
-    setCurrentUser(newUser);
-    
-    alert(`팀에 참여했습니다! 당신의 사용자 ID: ${userId}`);
-    navigate('/member-dashboard');
+      setCurrentUser(newUser);
+      
+      alert(`팀에 참여했습니다! 당신의 사용자 ID: ${newUser.id}`);
+      navigate('/member-dashboard');
+    } catch (error) {
+      console.error('팀 참여 실패:', error);
+      alert('팀 참여에 실패했습니다');
+    }
   };
 
   return (

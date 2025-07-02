@@ -82,12 +82,12 @@ export function DocumentManagement() {
     try {
       const url = await getDocumentUrl(document.file_path);
       if (url) {
-        const link = document.createElement('a');
-        link.href = url;
-        link.download = document.file_name;
-        document.body.appendChild(link);
-        link.click();
-        document.body.removeChild(link);
+        const linkElement = window.document.createElement('a');
+        linkElement.href = url;
+        linkElement.download = document.file_name;
+        window.document.body.appendChild(linkElement);
+        linkElement.click();
+        window.document.body.removeChild(linkElement);
       }
     } catch (error) {
       console.error('다운로드 실패:', error);

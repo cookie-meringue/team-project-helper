@@ -6,17 +6,15 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { useApp } from '@/contexts/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { Team, User } from '@/types';
-import { generateShortId } from '@/utils/idGenerator';
 
 export default function CreateTeam() {
   const [teamName, setTeamName] = useState('');
   const [maxMembers, setMaxMembers] = useState('');
   const [leaderName, setLeaderName] = useState('');
-  const { teams, setTeams, users, setUsers, setCurrentUser } = useApp();
+  const { createTeam, createUser, setCurrentUser } = useApp();
   const navigate = useNavigate();
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
     if (!teamName || !maxMembers || !leaderName) {
@@ -24,31 +22,32 @@ export default function CreateTeam() {
       return;
     }
 
-    const teamId = Date.now().toString();
-    const userId = generateShortId();
-    
-    const newTeam: Team = {
-      id: teamId,
-      name: teamName,
-      maxMembers: parseInt(maxMembers),
-      leaderId: userId,
-      leaderName: leaderName,
-      createdAt: new Date().toISOString(),
-    };
+    try {
+      // 먼저 사용자 생성
+      const newUser = await createUser({
+        name: leaderName,
+        type: 'leader',
+        teamId: '', // 팀 생성 후 업데이트
+      });
 
-    const newUser: User = {
-      id: userId,
-      name: leaderName,
-      type: 'leader',
-      teamId: teamId,
-    };
+      // 팀 생성
+      const newTeam = await createTeam({
+        name: teamName,
+        maxMembers: parseInt(maxMembers),
+        leaderId: newUser.id,
+        leaderName: leaderName,
+      });
 
-    setTeams([...teams, newTeam]);
-    setUsers([...users, newUser]);
-    setCurrentUser(newUser);
-    
-    alert(`팀이 생성되었습니다! 당신의 사용자 ID: ${userId}`);
-    navigate('/leader-dashboard');
+      // 사용자의 팀 ID 업데이트
+      const updatedUser = { ...newUser, teamId: newTeam.id };
+      setCurrentUser(updatedUser);
+      
+      alert(`팀이 생성되었습니다! 당신의 사용자 ID: ${newUser.id}`);
+      navigate('/leader-dashboard');
+    } catch (error) {
+      console.error('팀 생성 실패:', error);
+      alert('팀 생성에 실패했습니다');
+    }
   };
 
   return (

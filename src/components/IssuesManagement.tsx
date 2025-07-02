@@ -13,7 +13,7 @@ import { Issue } from '@/types';
 import { MessageSquare, Plus } from 'lucide-react';
 
 export function IssuesManagement() {
-  const { currentUser, issues, setIssues } = useApp();
+  const { currentUser, issues, createIssue, updateIssue, deleteIssue } = useApp();
   const [newTitle, setNewTitle] = useState('');
   const [newDescription, setNewDescription] = useState('');
   const [editingIssue, setEditingIssue] = useState<Issue | null>(null);
@@ -23,62 +23,69 @@ export function IssuesManagement() {
     .filter(i => i.teamId === currentUser?.teamId)
     .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
 
-  const handleCreateIssue = () => {
+  const handleCreateIssue = async () => {
     if (!newTitle.trim() || !newDescription.trim()) {
-      alert('Please fill in all fields');
+      alert('모든 필드를 입력해주세요');
       return;
     }
 
-    const newIssue: Issue = {
-      id: Date.now().toString(),
-      teamId: currentUser?.teamId || '',
-      title: newTitle,
-      description: newDescription,
-      createdBy: currentUser?.name || '',
-      createdAt: new Date().toISOString(),
-      updatedAt: new Date().toISOString(),
-      status: 'open',
-    };
+    try {
+      await createIssue({
+        teamId: currentUser?.teamId || '',
+        title: newTitle,
+        description: newDescription,
+        createdBy: currentUser?.name || '',
+        status: 'open' as const,
+      });
 
-    setIssues([...issues, newIssue]);
-    setNewTitle('');
-    setNewDescription('');
-    setIsDialogOpen(false);
+      setNewTitle('');
+      setNewDescription('');
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('이슈 생성 실패:', error);
+      alert('이슈 생성에 실패했습니다');
+    }
   };
 
-  const handleUpdateIssue = () => {
+  const handleUpdateIssue = async () => {
     if (!editingIssue || !newTitle.trim() || !newDescription.trim()) {
-      alert('Please fill in all fields');
+      alert('모든 필드를 입력해주세요');
       return;
     }
 
-    setIssues(
-      issues.map(i =>
-        i.id === editingIssue.id
-          ? { ...i, title: newTitle, description: newDescription, updatedAt: new Date().toISOString() }
-          : i
-      )
-    );
-    
-    setEditingIssue(null);
-    setNewTitle('');
-    setNewDescription('');
-    setIsDialogOpen(false);
+    try {
+      await updateIssue(editingIssue.id, {
+        title: newTitle,
+        description: newDescription,
+      });
+      
+      setEditingIssue(null);
+      setNewTitle('');
+      setNewDescription('');
+      setIsDialogOpen(false);
+    } catch (error) {
+      console.error('이슈 수정 실패:', error);
+      alert('이슈 수정에 실패했습니다');
+    }
   };
 
-  const handleUpdateStatus = (issueId: string, status: 'open' | 'in-progress' | 'resolved') => {
-    setIssues(
-      issues.map(i =>
-        i.id === issueId
-          ? { ...i, status, updatedAt: new Date().toISOString() }
-          : i
-      )
-    );
+  const handleUpdateStatus = async (issueId: string, status: 'open' | 'in-progress' | 'resolved') => {
+    try {
+      await updateIssue(issueId, { status });
+    } catch (error) {
+      console.error('상태 변경 실패:', error);
+      alert('상태 변경에 실패했습니다');
+    }
   };
 
-  const handleDeleteIssue = (id: string) => {
-    if (confirm('Are you sure you want to delete this issue?')) {
-      setIssues(issues.filter(i => i.id !== id));
+  const handleDeleteIssue = async (id: string) => {
+    if (confirm('정말로 이 이슈를 삭제하시겠습니까?')) {
+      try {
+        await deleteIssue(id);
+      } catch (error) {
+        console.error('이슈 삭제 실패:', error);
+        alert('이슈 삭제에 실패했습니다');
+      }
     }
   };
 
@@ -105,6 +112,15 @@ export function IssuesManagement() {
     }
   };
 
+  const getStatusText = (status: string) => {
+    switch (status) {
+      case 'open': return '열린 상태';
+      case 'in-progress': return '진행 중';
+      case 'resolved': return '해결됨';
+      default: return status;
+    }
+  };
+
   return (
     <div className="space-y-4">
       <Card>
@@ -112,38 +128,38 @@ export function IssuesManagement() {
           <div className="flex justify-between items-center">
             <CardTitle className="flex items-center gap-2">
               <MessageSquare className="w-5 h-5" />
-              Issues ({currentTeamIssues.length})
+              이슈 ({currentTeamIssues.length})
             </CardTitle>
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
               <DialogTrigger asChild>
                 <Button onClick={() => setIsDialogOpen(true)}>
                   <Plus className="w-4 h-4 mr-2" />
-                  New Issue
+                  새 이슈
                 </Button>
               </DialogTrigger>
               <DialogContent>
                 <DialogHeader>
                   <DialogTitle>
-                    {editingIssue ? 'Edit Issue' : 'Create New Issue'}
+                    {editingIssue ? '이슈 수정' : '새 이슈 생성'}
                   </DialogTitle>
                 </DialogHeader>
                 <div className="space-y-4">
                   <div>
-                    <Label htmlFor="title">Title</Label>
+                    <Label htmlFor="title">제목</Label>
                     <Input
                       id="title"
                       value={newTitle}
                       onChange={(e) => setNewTitle(e.target.value)}
-                      placeholder="Enter issue title"
+                      placeholder="이슈 제목을 입력하세요"
                     />
                   </div>
                   <div>
-                    <Label htmlFor="description">Description</Label>
+                    <Label htmlFor="description">설명</Label>
                     <Textarea
                       id="description"
                       value={newDescription}
                       onChange={(e) => setNewDescription(e.target.value)}
-                      placeholder="Describe the issue in detail"
+                      placeholder="이슈를 자세히 설명해주세요"
                       rows={4}
                     />
                   </div>
@@ -152,10 +168,10 @@ export function IssuesManagement() {
                       onClick={editingIssue ? handleUpdateIssue : handleCreateIssue}
                       className="flex-1"
                     >
-                      {editingIssue ? 'Update' : 'Create'}
+                      {editingIssue ? '수정' : '생성'}
                     </Button>
                     <Button variant="outline" onClick={resetDialog} className="flex-1">
-                      Cancel
+                      취소
                     </Button>
                   </div>
                 </div>
@@ -172,14 +188,14 @@ export function IssuesManagement() {
                     <div className="flex items-center gap-2 mb-2">
                       <h3 className="font-semibold text-lg">{issue.title}</h3>
                       <Badge className={getStatusColor(issue.status)}>
-                        {issue.status}
+                        {getStatusText(issue.status)}
                       </Badge>
                     </div>
                     <p className="text-gray-700 mb-2">{issue.description}</p>
                     <div className="text-sm text-gray-500">
-                      By {issue.createdBy} • {new Date(issue.createdAt).toLocaleDateString()}
+                      작성자: {issue.createdBy} • {new Date(issue.createdAt).toLocaleDateString()}
                       {issue.updatedAt !== issue.createdAt && (
-                        <span> • Updated {new Date(issue.updatedAt).toLocaleDateString()}</span>
+                        <span> • 수정됨: {new Date(issue.updatedAt).toLocaleDateString()}</span>
                       )}
                     </div>
                   </div>
@@ -192,14 +208,14 @@ export function IssuesManagement() {
                             size="sm"
                             onClick={() => openEditDialog(issue)}
                           >
-                            Edit
+                            수정
                           </Button>
                           <Button 
                             variant="destructive" 
                             size="sm"
                             onClick={() => handleDeleteIssue(issue.id)}
                           >
-                            Delete
+                            삭제
                           </Button>
                         </>
                       )}
@@ -212,9 +228,9 @@ export function IssuesManagement() {
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="open">Open</SelectItem>
-                        <SelectItem value="in-progress">In Progress</SelectItem>
-                        <SelectItem value="resolved">Resolved</SelectItem>
+                        <SelectItem value="open">열린 상태</SelectItem>
+                        <SelectItem value="in-progress">진행 중</SelectItem>
+                        <SelectItem value="resolved">해결됨</SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
@@ -224,7 +240,7 @@ export function IssuesManagement() {
             
             {currentTeamIssues.length === 0 && (
               <p className="text-center text-gray-500 py-8">
-                No issues yet. Create your first issue to get started!
+                아직 이슈가 없습니다. 첫 번째 이슈를 생성해보세요!
               </p>
             )}
           </div>

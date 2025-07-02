@@ -10,25 +10,27 @@ import { TeamMember } from '@/types';
 import { User, Plus } from 'lucide-react';
 
 export function MembersManagement() {
-  const { currentUser, teamMembers, setTeamMembers } = useApp();
+  const { currentUser, teamMembers, updateTeamMember } = useApp();
   const [editingMember, setEditingMember] = useState<TeamMember | null>(null);
   const [newRole, setNewRole] = useState('');
 
   const currentTeamMembers = teamMembers.filter(m => m.teamId === currentUser?.teamId);
 
-  const handleUpdateRole = (memberId: string, newRole: string) => {
-    setTeamMembers(
-      teamMembers.map(member =>
-        member.id === memberId ? { ...member, role: newRole } : member
-      )
-    );
-    setEditingMember(null);
-    setNewRole('');
+  const handleUpdateRole = async (memberId: string, newRole: string) => {
+    try {
+      await updateTeamMember(memberId, { role: newRole });
+      setEditingMember(null);
+      setNewRole('');
+    } catch (error) {
+      console.error('역할 수정 실패:', error);
+      alert('역할 수정에 실패했습니다');
+    }
   };
 
   const handleRemoveMember = (memberId: string) => {
-    if (confirm('Are you sure you want to remove this member?')) {
-      setTeamMembers(teamMembers.filter(m => m.id !== memberId));
+    if (confirm('정말로 이 멤버를 제거하시겠습니까?')) {
+      // TODO: 멤버 제거 기능 구현 필요
+      console.log('멤버 제거:', memberId);
     }
   };
 
@@ -38,7 +40,7 @@ export function MembersManagement() {
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
             <User className="w-5 h-5" />
-            Team Members ({currentTeamMembers.length})
+            팀 멤버 ({currentTeamMembers.length})
           </CardTitle>
         </CardHeader>
         <CardContent>
@@ -60,21 +62,21 @@ export function MembersManagement() {
                           setNewRole(member.role);
                         }}
                       >
-                        Edit Role
+                        역할 수정
                       </Button>
                     </DialogTrigger>
                     <DialogContent>
                       <DialogHeader>
-                        <DialogTitle>Edit Role for {member.name}</DialogTitle>
+                        <DialogTitle>{member.name}의 역할 수정</DialogTitle>
                       </DialogHeader>
                       <div className="space-y-4">
                         <div>
-                          <Label htmlFor="role">Role</Label>
+                          <Label htmlFor="role">역할</Label>
                           <Input
                             id="role"
                             value={newRole}
                             onChange={(e) => setNewRole(e.target.value)}
-                            placeholder="Enter role"
+                            placeholder="역할을 입력하세요"
                           />
                         </div>
                         <div className="flex gap-2">
@@ -82,10 +84,10 @@ export function MembersManagement() {
                             onClick={() => handleUpdateRole(member.id, newRole)}
                             className="flex-1"
                           >
-                            Update Role
+                            역할 수정
                           </Button>
                           <Button variant="outline" onClick={() => setEditingMember(null)} className="flex-1">
-                            Cancel
+                            취소
                           </Button>
                         </div>
                       </div>
@@ -97,7 +99,7 @@ export function MembersManagement() {
                     size="sm"
                     onClick={() => handleRemoveMember(member.id)}
                   >
-                    Remove
+                    제거
                   </Button>
                 </div>
               </div>
@@ -105,7 +107,7 @@ export function MembersManagement() {
             
             {currentTeamMembers.length === 0 && (
               <p className="text-center text-gray-500 py-8">
-                No team members yet. Share your QR code to invite members!
+                아직 팀원이 없습니다. QR 코드를 공유해서 팀원을 초대하세요!
               </p>
             )}
           </div>
