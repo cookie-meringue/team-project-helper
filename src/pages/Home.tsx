@@ -14,21 +14,7 @@ export default function Home() {
     setCurrentUser(null);
   };
 
-  // Only redirect if user is explicitly navigating to home, not on refresh
-  React.useEffect(() => {
-    if (currentUser && !loading && window.location.pathname === '/') {
-      // Only redirect if we're specifically on the home route
-      const timer = setTimeout(() => {
-        if (currentUser.type === 'leader') {
-          navigate('/leader-dashboard');
-        } else {
-          navigate('/member-dashboard');
-        }
-      }, 100); // Small delay to prevent issues with initial load
-
-      return () => clearTimeout(timer);
-    }
-  }, [currentUser, loading, navigate]);
+  // 자동 리다이렉트 로직 완전 제거 - 사용자가 명시적으로 버튼을 클릭해야만 이동
 
   if (loading) {
     return (
@@ -47,9 +33,24 @@ export default function Home() {
         {currentUser && (
           <div className="mb-4 text-center">
             <p className="text-sm text-gray-600 mb-2">{currentUser.name}님으로 로그인됨</p>
-            <Button variant="outline" size="sm" onClick={handleLogout}>
-              로그아웃
-            </Button>
+            <div className="flex space-x-2 justify-center">
+              <Button 
+                variant="default" 
+                size="sm" 
+                onClick={() => {
+                  if (currentUser.type === 'leader') {
+                    navigate('/leader-dashboard');
+                  } else {
+                    navigate('/member-dashboard');
+                  }
+                }}
+              >
+                대시보드로 이동
+              </Button>
+              <Button variant="outline" size="sm" onClick={handleLogout}>
+                로그아웃
+              </Button>
+            </div>
           </div>
         )}
         
